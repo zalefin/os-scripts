@@ -2,6 +2,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+from labellines import labelLine, labelLines
 
 MAX_CYLNDER = 4999
 QUEUE = [2069, 1212, 2296, 2800, 544, 1618, 356, 1523, 4965, 3681]
@@ -14,19 +16,17 @@ SHOW_PLOTS = True
 def show_seek_path(path_list, name):
     if not SHOW_PLOTS:
         return
-    # Pending disk path:
+    # disk path:
     y = np.array(list(reversed(list(range(len(path_list))))))
     x = np.array(path_list)
-    plt.quiver(x[:-1], y[:-1], x[1:] - x[:-1], y[1:] - y[:-1], scale_units='xy', angles='xy', scale=1, width=0.002)
-
-    # Previous to current arrow:
-    y = np.array([len(path_list), len(path_list) - 1])
-    x = np.array([PREVIOUS, CURRENT])
-    plt.quiver(x[:-1], y[:-1], x[1:] - x[:-1], y[1:] - y[:-1], scale_units='xy', angles='xy', scale=1, width=0.002, color="blue")
+    linvals = [[np.linspace(y[i],y[i+1],1000),np.linspace(x[i], x[i+1], 1000)] for i in range(len(y)-1)]
+    for xs, ys in linvals:
+        plt.plot(xs+(abs(xs[0]-xs[-1])/2), ys, label=str(abs(ys[0]-ys[-1])))
+    labelLines(plt.gca().get_lines(), xvals=y, zorder=2.5, align=False, drop_label=False)
 
     plt.title(str(QUEUE) + "\n" + name + "\n" + str(path_list))
-    plt.axvline(x=0)
-    plt.axvline(x=MAX_CYLNDER)
+    plt.axhline(y=0)
+    plt.axhline(y=MAX_CYLNDER)
     plt.show()
 
 
@@ -165,6 +165,7 @@ def LOOK():
     show_seek_path(ordered, "LOOK")
 
 
-disk_schedulers = (FCFS, SSTF, SCAN, LOOK, CSCAN, CLOOK)
-for sched in disk_schedulers:
-    sched()
+if __name__ == "__main__":
+    disk_schedulers = (FCFS, SSTF, SCAN, LOOK, CSCAN, CLOOK)
+    for sched in disk_schedulers:
+        sched()

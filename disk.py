@@ -14,17 +14,41 @@ SHOW_PLOTS = True
 
 
 def show_seek_path(path_list, name):
+    path_list = [PREVIOUS] + path_list
     if not SHOW_PLOTS:
         return
     # disk path:
     y = np.array(list(reversed(list(range(len(path_list))))))
-    x = np.array(path_list)
-    linvals = [[np.linspace(y[i],y[i+1],1000),np.linspace(x[i], x[i+1], 1000)] for i in range(len(y)-1)]
-    for xs, ys in linvals:
-        plt.plot(xs+(abs(xs[0]-xs[-1])/2), ys, label=str(abs(ys[0]-ys[-1])))
-    labelLines(plt.gca().get_lines(), xvals=y, zorder=2.5, align=False, drop_label=False)
+    x = np.array(list(reversed(path_list)))
+    linvals = [[np.linspace(y[i], y[i + 1], 1000), np.linspace(x[i], x[i + 1], 1000)] for i in range(len(y) - 1)]
 
-    plt.title(str(QUEUE) + "\n" + name + "\n" + str(path_list))
+    # pending disk movement:
+    for xs, ys in linvals[:-1]:
+        plt.plot(xs + (abs(xs[0] - xs[-1]) / 2), ys, label=str(abs(ys[0] - ys[-1])), color="black", alpha=0.5)
+
+    # previous disk movement:
+    for xs, ys in [linvals[-1]]:
+        plt.plot(xs + (abs(xs[0] - xs[-1]) / 2), ys, label=str(abs(ys[0] - ys[-1])), color="blue", alpha=0.5)
+
+    labelLines(plt.gca().get_lines(), xvals=y, zorder=2.5, align=False, drop_label=False, color='black')
+
+    plt.title(str(QUEUE) + "\n" + name + "\n" + str(path_list[1:]))
+
+    for index, path in enumerate(path_list[2:]):
+        #plt.annotate("[" + str(path) + "]", (index + 0.2, path))
+        t = plt.text(index + 2.3, path - 0.3, str(path))
+        t.set_bbox(dict(facecolor='grey', alpha=0.5, edgecolor='black'))
+
+    for index, path in enumerate([path_list[0]]):
+        #plt.annotate("[" + str(path) + "]", (index + 0.2, path))
+        t = plt.text(index + 0.3, path - 0.3, str(path))
+        t.set_bbox(dict(facecolor='blue', alpha=0.3, edgecolor='blue'))
+
+    for index, path in enumerate([path_list[1]]):
+        #plt.annotate("[" + str(path) + "]", (index + 0.2, path))
+        t = plt.text(index + 1.3, path - 0.3, str(path))
+        t.set_bbox(dict(facecolor='green', alpha=0.3, edgecolor='green'))
+
     plt.axhline(y=0)
     plt.axhline(y=MAX_CYLNDER)
     plt.show()

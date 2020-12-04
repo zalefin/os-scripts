@@ -1,5 +1,5 @@
-process X,Y
-sem s1=0,s2=0
+process X, Y, Z
+sem s1=0, s2=0
 terminal 3
-constraint (X_1>Y_1)&(X_1>Z_1)
-
+constraint (X_1 > Y_1) & (X_1 > Z_1)
+constraint X_1 > Y_1 & X_1 > Z_1 | Y_1 > Z_1

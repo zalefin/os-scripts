@@ -29,5 +29,6 @@ class Simulator(object):
 
 
 class Env(object):
-    def __init__(self):
-        pass
+    def __init__(self, prog_names, sems, terminal, constraints):
+        self.t = 0
+        self.step = 0

@@ -1,9 +1,8 @@
-process X,Y,Z
-sem s1=0,s2=0,s3=0,s4=0,s5=0
+process X, Y, Z
+sem s1=0, s2=0, s3=0, s4=0, s5=0
 terminal 5
-constraint X_1<Y_1&X_1<Z_1
-constraint Y_3>Z_2
-constraint Z_3>Y_4&Z_3>X_3
-constraint X_4>Y_4|X_4>Z_4
-constraint X_5<Y_5&X_5<Z_5
-
+constraint X_1 < Y_1 & X_1 < Z_1
+constraint Y_3 > Z_2
+constraint Z_3 > Y_4 & Z_3 > X_3
+constraint X_4 > Y_4 | X_4 > Z_4
+constraint X_5 < Y_5 & X_5 < Z_5

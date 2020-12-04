@@ -66,6 +66,9 @@ class Val(Expr):
     def set(self, val):
         self.vals[0] = val
 
+    def print_walk(self, indent=0):
+        print(''.join(['\t']*indent) + str(self.name))
+
 
 def parse_constraint(c_tokens):
     if isinstance(c_tokens, list):

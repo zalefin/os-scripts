@@ -63,26 +63,26 @@ def FCFS():
 
 def SCAN():
     if PREVIOUS < CURRENT:
-        direction = "right"
+        direction = "up"
     elif PREVIOUS > CURRENT:
-        direction = "left"
+        direction = "down"
 
-    right_side = [pos for pos in QUEUE if pos > CURRENT]
-    left_side = [pos for pos in QUEUE if pos < CURRENT]
+    above = [pos for pos in QUEUE if pos > CURRENT]
+    below = [pos for pos in QUEUE if pos < CURRENT]
 
-    if direction == "right":
-        if MAX_CYLNDER not in right_side:
-            right_side.append(MAX_CYLNDER)
+    if direction == "up":
+        if MAX_CYLNDER not in above:
+            above.append(MAX_CYLNDER)
 
-    elif direction == "left":
-        if 0 not in left_side:
-            left_side.append(0)
+    elif direction == "down":
+        if 0 not in below:
+            below.append(0)
 
-    if direction == "right":
-        ordered = sorted(right_side) + list(reversed(sorted(left_side)))
+    if direction == "up":
+        ordered = sorted(above) + list(reversed(sorted(below)))
 
-    if direction == "left":
-        ordered = list(reversed(sorted(left_side))) + sorted(right_side)
+    if direction == "down":
+        ordered = list(reversed(sorted(below))) + sorted(above)
 
     ordered = [CURRENT] + ordered
     total = 0
@@ -111,23 +111,32 @@ def SSTF():
 
 def CSCAN():
     if PREVIOUS < CURRENT:
-        direction = "right"
+        direction = "up"
     elif PREVIOUS > CURRENT:
-        direction = "left"
+        direction = "down"
 
-    right_side = [pos for pos in QUEUE if pos > CURRENT]
-    left_side = [pos for pos in QUEUE if pos < CURRENT]
+    above = [pos for pos in QUEUE if pos > CURRENT]
+    below = [pos for pos in QUEUE if pos < CURRENT]
 
-    if MAX_CYLNDER not in right_side:
-        right_side.append(MAX_CYLNDER)
-    if 0 not in left_side:
-        left_side.append(0)
+    # Only add upper and lower bound if the arm actually needs to "reset"
+    if (len(below) != 0 and direction == "up"):
+        if MAX_CYLNDER not in above:
+            above.append(MAX_CYLNDER)
+        if 0 not in below:
+            below.append(0)
 
-    if direction == "right":
-        ordered = sorted(right_side) + list(sorted(left_side))
+    # If arm is already "resetting" it must go all the way to 0
+    elif direction == "down":
+        if 0 not in below:
+            below.append(0)
 
-    if direction == "left":
-        ordered = list(reversed(sorted(left_side))) + list(reversed(sorted(right_side)))
+    # If going up, arm goes until MAX_CYLNDER then resets to do all values below where it started
+    if direction == "up":
+        ordered = sorted(above) + list(sorted(below))
+
+    # If going down, arm is "resetting" all the way to 0
+    if direction == "down":
+        ordered = list(sorted(below)) + list(sorted(above))
 
     ordered = [CURRENT] + ordered
     total = 0
@@ -140,18 +149,20 @@ def CSCAN():
 
 def CLOOK():
     if PREVIOUS < CURRENT:
-        direction = "right"
+        direction = "up"
     elif PREVIOUS > CURRENT:
-        direction = "left"
+        direction = "down"
 
-    right_side = [pos for pos in QUEUE if pos > CURRENT]
-    left_side = [pos for pos in QUEUE if pos < CURRENT]
+    above = [pos for pos in QUEUE if pos > CURRENT]
+    below = [pos for pos in QUEUE if pos < CURRENT]
 
-    if direction == "right":
-        ordered = sorted(right_side) + list(sorted(left_side))
+    # if going up finish the rest above, then go to lowest remaining and start working up again
+    if direction == "up":
+        ordered = sorted(above) + sorted(below)
 
-    if direction == "left":
-        ordered = list(reversed(sorted(left_side))) + list(reversed(sorted(right_side)))
+    # If going down, then arm is "resetting" all the way to the lowest value
+    if direction == "down":
+        ordered = sorted(below) + sorted(above)
 
     ordered = [CURRENT] + ordered
     total = 0
@@ -164,18 +175,18 @@ def CLOOK():
 
 def LOOK():
     if PREVIOUS < CURRENT:
-        direction = "right"
+        direction = "up"
     elif PREVIOUS > CURRENT:
-        direction = "left"
+        direction = "down"
 
-    right_side = [pos for pos in QUEUE if pos > CURRENT]
-    left_side = [pos for pos in QUEUE if pos < CURRENT]
+    above = [pos for pos in QUEUE if pos > CURRENT]
+    below = [pos for pos in QUEUE if pos < CURRENT]
 
-    if direction == "right":
-        ordered = sorted(right_side) + list(reversed(sorted(left_side)))
+    if direction == "up":
+        ordered = sorted(above) + list(reversed(sorted(below)))
 
-    if direction == "left":
-        ordered = list(reversed(sorted(left_side))) + sorted(right_side)
+    if direction == "down":
+        ordered = list(reversed(sorted(below))) + sorted(above)
 
     ordered = [CURRENT] + ordered
     total = 0

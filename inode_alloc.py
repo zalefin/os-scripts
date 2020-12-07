@@ -5,8 +5,13 @@ FILE_BLOCKS = 2000
 ENTRY_SIZE_BYTES = 4
 ENTRIES_PER_BLOCK = 15
 
+DIRECT_IN_INODE = 12
+
 
 def find_index_blocks():
+    """This assumes all index blocks are 15 (12 + 3 for inode, and 15 for indirect and direct blocks),
+    if they aren't you'll have to change this function and the find_total_bytes function"""
+
     remaining = FILE_BLOCKS
     level = "within inode"
     num_index_blocks = 0
@@ -15,7 +20,7 @@ def find_index_blocks():
 
         if level == "within inode":
             num_index_blocks += 1  # this is the inode itself
-            remaining -= 12  # the direct block pointers
+            remaining -= DIRECT_IN_INODE  # the direct block pointers
             level = "single indirect"
 
         elif level == "single indirect":
@@ -60,27 +65,30 @@ def find_index_blocks():
 
 
 def find_total_bytes():
+    """This will have to be something different if not all blocks are 15"""
     return find_index_blocks() * ENTRY_SIZE_BYTES * ENTRIES_PER_BLOCK
 
 
 def num_searches():
-    """Basically you count "nodes" & "edges" in shortest path to the file block pointer"""
+    """Basically you count "nodes" + "edges" in shortest path to the file block pointer"""
 
     # If small file (all block pointers in inode)
-    if 0 <= FILE_BLOCKS <= 12:
+    if 0 <= FILE_BLOCKS <= DIRECT_IN_INODE:
         return 1
 
     # Single indirect:
-    if 13 <= FILE_BLOCKS <= 27:
+    if DIRECT_IN_INODE < FILE_BLOCKS <= (DIRECT_IN_INODE + ENTRIES_PER_BLOCK):
         return 3
 
     # Double indirect:
-    if 28 <= FILE_BLOCKS <= 225:
+    if (DIRECT_IN_INODE + ENTRIES_PER_BLOCK) < FILE_BLOCKS <= ((DIRECT_IN_INODE + ENTRIES_PER_BLOCK) + ENTRIES_PER_BLOCK ** 2):
         return 5
 
     # Triple indirect:
-    if 226 <= FILE_BLOCKS <= float("inf"):
+    if ((DIRECT_IN_INODE + ENTRIES_PER_BLOCK) + ENTRIES_PER_BLOCK ** 2) < FILE_BLOCKS <= float("inf"):
         return 7
+
+    return "Should never get this string"
 
 
 if __name__ == "__main__":

@@ -63,5 +63,25 @@ def find_total_bytes():
     return find_index_blocks() * ENTRY_SIZE_BYTES * ENTRIES_PER_BLOCK
 
 
+def num_searches():
+    """Basically you count "nodes" & "edges" in shortest path to the file block pointer"""
+
+    # If small file (all block pointers in inode)
+    if 0 <= FILE_BLOCKS <= 12:
+        return 1
+
+    # Single indirect:
+    if 13 <= FILE_BLOCKS <= 27:
+        return 3
+
+    # Double indirect:
+    if 28 <= FILE_BLOCKS <= 225:
+        return 5
+
+    # Triple indirect:
+    if 226 <= FILE_BLOCKS <= float("inf"):
+        return 7
+
+
 if __name__ == "__main__":
-    print("Total bytes =", find_total_bytes(), " Index blocks =", find_index_blocks())
+    print("Total bytes =", find_total_bytes(), "\nIndex blocks =", find_index_blocks(), "\nRequired searches =", num_searches())

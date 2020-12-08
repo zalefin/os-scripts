@@ -14,14 +14,14 @@ def find_index_blocks(n_blocks):
 
     remaining = n_blocks
     level = "within inode"
-    num_tables = 0
+    tables = []
 
-    while remaining > 0:
+    while remaining_file_blocks > 0:
 
         if level == "within inode":
-            num_tables += 1  # this is the inode itself
+            tables.append("inode")  # this is the inode itself
 
-            remaining -= DIRECT_IN_INODE  # the direct block pointers in the inode
+            remaining_file_blocks -= DIRECT_IN_INODE  # the direct block pointers in the inode
 
             # Advance to next level
             level = "single indirect"
@@ -29,7 +29,7 @@ def find_index_blocks(n_blocks):
         elif level == "single indirect":
 
             # Create a direct pointer table and fill its entries with direct pointers to file blocks
-            num_tables += 1; remaining -= SLOTS_PER_TABLE
+            tables.append("direct"); remaining_file_blocks -= SLOTS_PER_TABLE
 
             # Advance to next level
             level = "double indirect"
@@ -37,7 +37,7 @@ def find_index_blocks(n_blocks):
         elif level == "double indirect":
 
             # The double indirect table itself
-            num_tables += 1
+            tables.append("double indirect")
 
             # While there are remaining "single indirect slots" in the "double indirect table"
             indirect_slots = SLOTS_PER_TABLE
@@ -45,11 +45,11 @@ def find_index_blocks(n_blocks):
                 indirect_slots -= 1
 
                 # Create a direct pointer table and fill its entries with direct pointers to file blocks
-                num_tables += 1; remaining -= SLOTS_PER_TABLE
+                tables.append("direct"); remaining_file_blocks -= SLOTS_PER_TABLE
 
                 # Always check if most recently added direct pointer table was enough to satisfy all file blocks
-                if remaining <= 0:
-                    return num_tables
+                if remaining_file_blocks <= 0:
+                    return len(tables)
 
             # Advance to next level
             level = "triple indirect"
@@ -57,7 +57,7 @@ def find_index_blocks(n_blocks):
         elif level == "triple indirect":
 
             # The triple indirect table itself
-            num_tables += 1
+            tables.append("triple indirect")
 
             # While there are remaining "double indirect slots" in the "triple indirect table"
             double_indirect_slots = SLOTS_PER_TABLE
@@ -65,7 +65,7 @@ def find_index_blocks(n_blocks):
                 double_indirect_slots -= 1
 
                 # Allocate a double indirect table
-                num_tables += 1
+                tables.append("double indirect")
 
                 # While there are remaining "single indirect slots" in this particular "double indirect table"
                 indirect_slots = SLOTS_PER_TABLE
@@ -73,13 +73,13 @@ def find_index_blocks(n_blocks):
                     indirect_slots -= 1
 
                     # Create a direct pointer table and fill its entries with direct pointers to file blocks
-                    num_tables += 1; remaining -= SLOTS_PER_TABLE
+                    tables.append("direct"); remaining_file_blocks -= SLOTS_PER_TABLE
 
                     # Always check if most recently added direct pointer table was enough to satisfy all file blocks
-                    if remaining <= 0:
-                        return num_tables
+                    if remaining_file_blocks <= 0:
+                        return len(tables)
 
-    return num_tables
+    return len(tables)
 
 
 def find_total_bytes():

@@ -8,11 +8,11 @@ SLOTS_PER_TABLE = 15
 DIRECT_IN_INODE = 12
 
 
-def find_index_blocks():
+def find_index_blocks(n_blocks):
     """This assumes all index blocks are 15 (12 + 3 for inode, and 15 for indirect and direct blocks),
     if they aren't you'll have to change this function and the find_total_bytes function"""
 
-    remaining = FILE_BLOCKS
+    remaining = n_blocks
     level = "within inode"
     num_tables = 0
 
@@ -84,7 +84,7 @@ def find_index_blocks():
 
 def find_total_bytes():
     """This will have to be something different if not all tables are 15"""
-    return find_index_blocks() * ENTRY_SIZE_BYTES * SLOTS_PER_TABLE
+    return find_index_blocks(FILE_BLOCKS) * ENTRY_SIZE_BYTES * SLOTS_PER_TABLE
 
 
 def num_searches():

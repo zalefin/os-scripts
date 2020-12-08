@@ -110,4 +110,4 @@ def num_searches():
 
 
 if __name__ == "__main__":
-    print("Total bytes =", find_total_bytes(), "\nIndex blocks =", find_index_blocks(), "\nRequired searches =", num_searches())
+    print("Total bytes =", find_total_bytes(), "\nIndex blocks =", find_index_blocks(FILE_BLOCKS), "\nRequired searches =", num_searches())

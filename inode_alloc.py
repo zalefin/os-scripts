@@ -21,43 +21,59 @@ def find_index_blocks():
         if level == "within inode":
             num_index_blocks += 1  # this is the inode itself
             remaining -= DIRECT_IN_INODE  # the direct block pointers
+
+            # Advance to next level
             level = "single indirect"
 
         elif level == "single indirect":
             num_index_blocks += 1
             remaining -= ENTRIES_PER_BLOCK
+
+            # Advance to next level
             level = "double indirect"
 
         elif level == "double indirect":
+
+            # The double indirect table itself
             num_index_blocks += 1
 
-            remaining_directs = ENTRIES_PER_BLOCK
-            while remaining_directs > 0:
+            # While there are remaining "single indirect slots" in the "double indirect table"
+            indirect_slots = ENTRIES_PER_BLOCK
+            while indirect_slots > 0:
+                indirect_slots -= 1
 
-                remaining_directs -= 1
-                num_index_blocks += 1
-                remaining -= ENTRIES_PER_BLOCK
+                # Create a direct pointer table and fill its entries with direct pointers to file blocks
+                num_index_blocks += 1; remaining -= ENTRIES_PER_BLOCK
 
+                # Always check if most recently added direct pointer table was enough to satisfy all file blocks
                 if remaining <= 0:
                     return num_index_blocks
+
+            # Advance to next level
             level = "triple indirect"
 
         elif level == "triple indirect":
+
+            # The triple indirect table itself
             num_index_blocks += 1
 
-            remaining_indirects = ENTRIES_PER_BLOCK
-            while remaining_indirects > 0:
+            # While there are remaining "double indirect slots" in the "triple indirect table"
+            double_indirect_slots = ENTRIES_PER_BLOCK
+            while double_indirect_slots > 0:
+                double_indirect_slots -= 1
 
+                # Allocate a double indirect table
                 num_index_blocks += 1
-                remaining_indirects -= 1
-                remaining_directs = ENTRIES_PER_BLOCK
 
-                while remaining_directs > 0:
+                # While there are remaining "single indirect slots" in this particular "double indirect table"
+                indirect_slots = ENTRIES_PER_BLOCK
+                while indirect_slots > 0:
+                    indirect_slots -= 1
 
-                    remaining_directs -= 1
-                    num_index_blocks += 1
-                    remaining -= ENTRIES_PER_BLOCK
+                    # Create a direct pointer table and fill its entries with direct pointers to file blocks
+                    num_index_blocks += 1; remaining -= ENTRIES_PER_BLOCK
 
+                    # Always check if most recently added direct pointer table was enough to satisfy all file blocks
                     if remaining <= 0:
                         return num_index_blocks
 

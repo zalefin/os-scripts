@@ -8,11 +8,10 @@ SLOTS_PER_TABLE = 15
 DIRECT_IN_INODE = 12
 
 
-def find_index_blocks(n_blocks):
+def find_index_blocks(remaining_file_blocks=FILE_BLOCKS):
     """This assumes all index blocks are 15 (12 + 3 for inode, and 15 for indirect and direct blocks),
     if they aren't you'll have to change this function and the find_total_bytes function"""
 
-    remaining = n_blocks
     level = "within inode"
     tables = []
 

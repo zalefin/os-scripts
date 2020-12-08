@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 import numpy as np
 
 from inode_alloc import ENTRY_SIZE_BYTES, SLOTS_PER_TABLE

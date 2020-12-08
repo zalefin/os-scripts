@@ -81,7 +81,7 @@ def find_index_blocks():
 
 
 def find_total_bytes():
-    """This will have to be something different if not all blocks are 15"""
+    """This will have to be something different if not all tables are 15"""
     return find_index_blocks() * ENTRY_SIZE_BYTES * ENTRIES_PER_BLOCK
 
 
